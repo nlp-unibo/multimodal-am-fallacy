@@ -1,0 +1,68 @@
+import tensorflow as tf
+from transformers import TFBertModel
+
+maxBERTLen = 512
+maxFrameLen = 768 # embedding shape wav2vec
+#TODO: add code for bert trainable
+
+def bert_model( num_labels, config='text_only', is_bert_trainable=False, max_sentence_len=maxBERTLen, max_frame_len = maxFrameLen,  dropout_text=0.1, answer_units=100, audio_units=64, audio_l2=0.0005, dropout_audio=0.1):
+    # Text
+    if config != 'audio_only':
+
+        input_ids = tf.keras.layers.Input(shape=(max_sentence_len,), dtype=tf.int32)
+        token_type_ids = tf.keras.layers.Input(shape=(max_sentence_len,), dtype=tf.int32)
+        attention_mask = tf.keras.layers.Input(shape=(max_sentence_len,), dtype=tf.int32)
+        bertModel = TFBertModel.from_pretrained("bert-base-uncased")(input_ids, token_type_ids=token_type_ids,
+                                                                     attention_mask=attention_mask)[-1]
+        text_emb = tf.keras.layers.Dropout(rate=dropout_text)(bertModel)
+
+
+    # Audio
+    if config != 'text_only':
+        audio_input = tf.keras.layers.Input(shape=(max_frame_len, ))
+        audio_emb = tf.keras.layers.Lambda(lambda x: tf.expand_dims(x, axis=1))(audio_input)
+        audio_lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units=audio_units,
+                                                                        kernel_regularizer=tf.keras.regularizers.l2(
+                                                                            l2=audio_l2)))(audio_emb)
+
+
+        #audio_emb = tf.keras.layers.Reshape( [audio_lstm.shape[0], -1])(audio_lstm)
+        audio_emb = tf.keras.layers.Dropout(rate=dropout_audio)(audio_lstm)
+
+
+    # Text-Audio
+    if config == 'text_audio':
+        stacked_features = tf.concat((text_emb, audio_emb), axis=-1)
+
+        answer = tf.keras.layers.Dense(units=answer_units)(stacked_features)
+        bn = tf.keras.layers.BatchNormalization()(answer)
+        out = tf.keras.layers.Dense(num_labels, activation=tf.nn.relu)(tf.keras.layers.Dropout(0.1)(bn))
+        model = tf.keras.Model(inputs=[input_ids, token_type_ids, attention_mask, audio_input], outputs=out)
+        return model
+
+    # Text
+    if config == 'text_only':
+        answer = tf.keras.layers.Dense(units=answer_units)(text_emb)
+        bn = tf.keras.layers.BatchNormalization()(answer)
+        out = tf.keras.layers.Dense(num_labels, activation=tf.nn.relu)(tf.keras.layers.Dropout(0.1)(bn))
+        model = tf.keras.Model(inputs=[input_ids, token_type_ids, attention_mask], outputs=out)
+
+        return model
+
+    # Audio
+    if config == 'audio_only':
+        answer = tf.keras.layers.Dense(units=answer_units)(audio_emb)
+        bn = tf.keras.layers.BatchNormalization()(answer)
+        out = tf.keras.layers.Dense(num_labels, activation=tf.nn.relu)(tf.keras.layers.Dropout(0.1)(bn))
+        model = tf.keras.Model(inputs=[audio_input], outputs=out)
+
+        return model
+
+
+
+
+
+
+
+
+
