@@ -13,3 +13,4 @@ def set_reproducibility(seed=15371):
     os.environ['TF_DETERMINISTIC_OPS'] = '1'
     #os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
     tf.config.experimental.enable_op_determinism()
+    return seed
