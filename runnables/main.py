@@ -17,6 +17,7 @@ Xval, yval= data_loader.get_sentences(split = 'val', df=df)
 Xtest,  ytest = data_loader.get_sentences(split = 'test', df=df)
 
 encoded_Xtrain, y_train, max_sentence_len = converter.prepare_text_data(Xtrain, ytrain, is_train=True, q=0.99) # 0.99 is the quantile for the max sentence length (99% of the sentences are shorter than this length
+#max_sentence_len = 512 # set the max sentence length to 512 TO BE REMOVED
 encoded_audio_train, max_frame_len = converter.prepare_audio_data(train_audio_files, model_type='embedding', is_train=True) # modify to have train, val and test audio files
 
 encoded_Xval, y_val = converter.prepare_text_data(Xval, yval, q=0.99, maxSentenceLen=max_sentence_len)
@@ -29,8 +30,8 @@ encoded_audio_test = converter.prepare_audio_data(test_audio_files, model_type='
 n_labels = data_loader.get_num_labels(ytrain)
 
 
-config_list = ['audio_only', 'text_only', 'text_audio']
-#config_list = ['text_only']
+#config_list = ['audio_only', 'text_only', 'text_audio']
+config_list = ['text_only']
 config_params = {'epochs': 1,
                 'batch_size': 8,
                 'callbacks': 'early_stopping',
@@ -41,6 +42,7 @@ config_params = {'epochs': 1,
 for config in config_list:
 
     config_params['config'] = config
+
     # Instatiate the model
     model = model_implementation.bert_model(num_labels=n_labels,
                                             config=config,
@@ -68,6 +70,7 @@ for config in config_list:
 
     # Compile Model
     model_utils.compile_model(model)
+    seed = reproducibility.set_reproducibility()
 
     # Train Model
     model_utils.train_model(model, train_data, val_data,
@@ -75,6 +78,8 @@ for config in config_list:
                             batch_size=config_params['batch_size'],
                             callbacks=config_params['callbacks'],
                             use_class_weights=config_params['use_class_weights'])
+
+    print(model.summary())
 
     # Evaluate Model
     cr = evaluation.evaluate_model(model, test_data)

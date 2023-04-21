@@ -5,7 +5,7 @@ import os
 import json
 
 
-def compile_model(model, lr=0.0001, loss=tf.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy', f1_m]):
+def compile_model(model, lr=5e-05, loss=tf.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy', f1_m]):
     model.compile(optimizer=tf.keras.optimizers.legacy.Adam(learning_rate=lr), loss=loss, metrics=metrics)
     return model
 

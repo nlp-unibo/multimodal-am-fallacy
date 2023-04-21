@@ -30,11 +30,17 @@ def prepare_text_data(X, y, text_model='bert', maxSentenceLen = maxBERTLen, is_t
         }
 
 
+        # store inputs_ids_not_padded to calculate the maxSentenceLen
+        if is_train:
+            for i in range(len(X)):
+                data = tokenizer.encode_plus(X[i].strip(), truncation=True)
+                dataFields['input_ids_not_padded'].append(data['input_ids'])
+
+            maxSentenceLen=get_max_sentence_len(dataFields['input_ids_not_padded'], q=q)
 
         for i in range(len(X)):
-            data = tokenizer.encode_plus(X[i].strip(), truncation=True)
-            dataFields['input_ids_not_padded'].append(data['input_ids'])
             #data = tokenizer(X[i], truncation=True)
+            data = tokenizer.encode_plus(X[i].strip(), truncation=True)
             padded = pad([data['input_ids'], data['attention_mask'], data['token_type_ids']], padding = 'post', truncating = 'post', maxlen = maxSentenceLen)
             dataFields['input_ids'].append(padded[0])
             dataFields['attention_mask'].append(padded[1])
@@ -47,17 +53,17 @@ def prepare_text_data(X, y, text_model='bert', maxSentenceLen = maxBERTLen, is_t
         y_enc = np.array(encode_labels(y))
 
         if is_train:
-            maxSentenceLen=get_max_sentence_len(dataFields['input_ids_not_padded'], q=q)
+            #maxSentenceLen=get_max_sentence_len(dataFields['input_ids_not_padded'], q=q)
             # cut the data to the maxSentenceLen
-            dataFields['input_ids'] = dataFields['input_ids'][:, :maxSentenceLen]
-            dataFields['attention_mask'] = dataFields['attention_mask'][:, :maxSentenceLen]
-            dataFields['token_type_ids'] = dataFields['token_type_ids'][:, :maxSentenceLen]
+            # dataFields['input_ids'] = dataFields['input_ids'][:, :maxSentenceLen]
+            # dataFields['attention_mask'] = dataFields['attention_mask'][:, :maxSentenceLen]
+            # dataFields['token_type_ids'] = dataFields['token_type_ids'][:, :maxSentenceLen]
             return [dataFields["input_ids"], dataFields["token_type_ids"], dataFields["attention_mask"]], y_enc, maxSentenceLen
         else:
             # cut the data to the maxSentenceLen
-            dataFields['input_ids'] = dataFields['input_ids'][:, :maxSentenceLen]
-            dataFields['attention_mask'] = dataFields['attention_mask'][:, :maxSentenceLen]
-            dataFields['token_type_ids'] = dataFields['token_type_ids'][:, :maxSentenceLen]
+            # dataFields['input_ids'] = dataFields['input_ids'][:, :maxSentenceLen]
+            # dataFields['attention_mask'] = dataFields['attention_mask'][:, :maxSentenceLen]
+            # dataFields['token_type_ids'] = dataFields['token_type_ids'][:, :maxSentenceLen]
             return [dataFields["input_ids"], dataFields["token_type_ids"], dataFields["attention_mask"]], y_enc
 
 
