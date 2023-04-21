@@ -35,8 +35,14 @@ def bert_model( num_labels, config='text_only', is_bert_trainable=False, max_sen
         stacked_features = tf.concat((text_emb, audio_emb), axis=-1)
 
         answer = tf.keras.layers.Dense(units=answer_units)(stacked_features)
-        dense = tf.keras.layers.Dense(units=num_labels)(answer) #TODO: eventually remove it
+        dense = tf.keras.layers.Dense(units=answer_units/2)(answer)
+        dense = tf.keras.layers.Dense(units=num_labels)(dense)
+        #dense = tf.keras.layers.Dense(units=num_labels)(answer) #TODO: eventually remove it
         bn = tf.keras.layers.BatchNormalization()(dense)
+        #dense = tf.keras.layers.Dense(units=num_labels)(answer)  # TODO: eventually remove it
+        #bn = tf.keras.layers.BatchNormalization()(answer)
+        
+        #bn = tf.keras.layers.BatchNormalization()(dense)
         out = tf.keras.layers.Dense(num_labels, activation=tf.nn.relu)(tf.keras.layers.Dropout(0.1)(bn))
         model = tf.keras.Model(inputs=[input_ids, token_type_ids, attention_mask, audio_input], outputs=out)
         return model
@@ -44,8 +50,12 @@ def bert_model( num_labels, config='text_only', is_bert_trainable=False, max_sen
     # Text
     if config == 'text_only':
         answer = tf.keras.layers.Dense(units=answer_units)(text_emb)
-        dense = tf.keras.layers.Dense(units=num_labels)(answer)  # TODO: eventually remove it
+        dense = tf.keras.layers.Dense(units=answer_units/2)(answer)
+        dense = tf.keras.layers.Dense(units=num_labels)(dense)
+        #dense = tf.keras.layers.Dense(units=num_labels)(answer) #TODO: eventually remove it
         bn = tf.keras.layers.BatchNormalization()(dense)
+        #dense = tf.keras.layers.Dense(units=num_labels)(answer)  # TODO: eventually remove it
+        #bn = tf.keras.layers.BatchNormalization()(answer)
         out = tf.keras.layers.Dense(num_labels, activation=tf.nn.relu)(tf.keras.layers.Dropout(0.1)(bn))
         model = tf.keras.Model(inputs=[input_ids, token_type_ids, attention_mask], outputs=out)
 
@@ -54,8 +64,15 @@ def bert_model( num_labels, config='text_only', is_bert_trainable=False, max_sen
     # Audio
     if config == 'audio_only':
         answer = tf.keras.layers.Dense(units=answer_units)(audio_emb)
-        dense = tf.keras.layers.Dense(units=num_labels)(answer)  # TODO: eventually remove it
+        dense = tf.keras.layers.Dense(units=answer_units/2)(answer)
+        dense = tf.keras.layers.Dense(units=num_labels)(dense)
+        #dense = tf.keras.layers.Dense(units=num_labels)(answer) #TODO: eventually remove it
         bn = tf.keras.layers.BatchNormalization()(dense)
+        #dense = tf.keras.layers.Dense(units=num_labels)(answer)  # TODO: eventually remove it
+        #bn = tf.keras.layers.BatchNormalization()(answer)
+
+        #dense = tf.keras.layers.Dense(units=num_labels)(answer)  # TODO: eventually remove it
+        #bn = tf.keras.layers.BatchNormalization()(dense)
         out = tf.keras.layers.Dense(num_labels, activation=tf.nn.relu)(tf.keras.layers.Dropout(0.1)(bn))
         model = tf.keras.Model(inputs=[audio_input], outputs=out)
 

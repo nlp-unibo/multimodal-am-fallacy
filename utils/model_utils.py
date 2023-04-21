@@ -13,9 +13,10 @@ def train_model(model, train_dataset, val_dataset, epochs=100, batch_size=8, cal
     Xtrain = train_dataset[0]
     ytrain = train_dataset[1]
 
+    #TODO: put callback as a parameter of the train_model function and create a callback.py file  
     if callbacks == 'early_stopping':
-        callbacks = tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min', patience=5,
-                                                    restore_best_weights=True)
+        callbacks = tf.keras.callbacks.EarlyStopping(monitor='val_loss', mode='min', patience=8,
+                                                    restore_best_weights=True, verbose=1)
 
     if use_class_weights:
         weights = compute_class_weight(class_weight='balanced', classes=[0, 1, 2, 3, 4, 5], y=train_dataset[1])  #TODO: change this to the actual labels or to a generalizable code

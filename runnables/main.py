@@ -2,6 +2,9 @@ from utils import data_loader, converter, model_implementation, model_utils, rep
 import os
 import numpy as np
 
+# WARNING: comment the following line if you are not using CUDA
+os.environ["CUDA_VISIBLE_DEVICES"]="0,1"
+
 # Reproducibility settings
 seed = reproducibility.set_reproducibility()
 
@@ -31,12 +34,13 @@ n_labels = data_loader.get_num_labels(ytrain)
 
 
 #config_list = ['audio_only', 'text_only', 'text_audio']
-config_list = ['text_only']
-config_params = {'epochs': 1,
+config_list = ['text_audio']
+config_params = {'epochs': 20,
                 'batch_size': 8,
                 'callbacks': 'early_stopping',
                 'use_class_weights': True,
-                'seed': seed}
+                'seed': seed,
+                'lr':5e-05}
 
 # Build model input for each configuration
 for config in config_list:
@@ -58,6 +62,7 @@ for config in config_list:
 
     # Text
     elif config == 'text_only':
+        print(encoded_Xtrain[0].shape)
         train_data = (encoded_Xtrain, y_train)
         val_data = (encoded_Xval, y_val)
         test_data = (encoded_Xtest, y_test)
@@ -69,7 +74,7 @@ for config in config_list:
         test_data = (encoded_audio_test, y_test)
 
     # Compile Model
-    model_utils.compile_model(model)
+    model_utils.compile_model(model, lr=config_params['lr'])
     seed = reproducibility.set_reproducibility()
 
     # Train Model
