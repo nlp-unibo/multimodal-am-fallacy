@@ -82,6 +82,7 @@ def avg_results_cross_validation(results, project_dir, save_results = False):
                     'accuracy': np.mean(accuracy),
                     'macro_avg': np.mean(macro_avg),
                     'weighted_avg': np.mean(weighted_avg)}
+    
     if save_results == True:
         # save mean_results as a json file in the results folder
         # create a 'cross_validation' folder in the results folder if it doesn't exist
@@ -91,7 +92,8 @@ def avg_results_cross_validation(results, project_dir, save_results = False):
             os.makedirs(cross_validation_path)
 
         results_filepath = os.path.join(cross_validation_path, 'mean_results.json')
+        
         with open(results_filepath, 'w') as f:
-            json.dump(mean_results, f)
+            json.dump(mean_results, f, indent=4)
 
 

@@ -2,9 +2,12 @@ from utils import data_loader, converter, model_implementation, model_utils, rep
 import os
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
+import tensorflow as tf
+tf.get_logger().setLevel('INFO')
 
 # WARNING: comment the following line if you are not using CUDA
 os.environ["CUDA_VISIBLE_DEVICES"]="0,1"
+
 
 # Reproducibility settings
 seed = reproducibility.set_reproducibility()
@@ -20,6 +23,8 @@ Xtrain, ytrain = data_loader.get_sentences(split = 'train', df=df)
 Xval, yval= data_loader.get_sentences(split = 'val', df=df)
 #Xtest,  ytest = data_loader.get_sentences(split = 'test', df=df)
 
+print(Xtrain.shape, len(train_audio_files))
+
 # Concatenate train and val
 X = np.concatenate((Xtrain, Xval), axis=0)
 y = np.concatenate((ytrain, yval), axis=0)
@@ -32,6 +37,12 @@ for i, (train, test) in enumerate(skf.split(X, y)):
     print("Running Fold", i+1, "/", n_folds)
     Xtrain, Xval = X[train], X[test]
     ytrain, yval = y[train], y[test]
+    
+    print(train)
+    # get only the audio files corresponding to the train and test indexes
+    train_audio_files = [train_audio_files[k] for k in train]
+    val_audio_files = [val_audio_files[k] for k in test]
+
     #print(np.unique(ytrain, return_counts=True), np.unique(ytest, return_counts=True))
 
     #print(Xtrain.shape, ytrain.shape, Xtest.shape, ytest.shape)
@@ -51,8 +62,8 @@ for i, (train, test) in enumerate(skf.split(X, y)):
 
 
     #config_list = ['audio_only', 'text_only', 'text_audio']
-    config_list = ['text_only']
-    config_params = {'epochs': 1,
+    config_list = ['audio_only']
+    config_params = {'epochs': 100,
                     'batch_size': 8,
                     'callbacks': 'early_stopping',
                     'use_class_weights': True,
@@ -79,7 +90,7 @@ for i, (train, test) in enumerate(skf.split(X, y)):
 
         # Text
         elif config == 'text_only':
-            print(encoded_Xtrain[0].shape)
+            #print(encoded_Xtrain[0].shape)
             train_data = (encoded_Xtrain, y_train)
             val_data = (encoded_Xval, y_val)
             #test_data = (encoded_Xtest, y_test)
@@ -109,7 +120,8 @@ for i, (train, test) in enumerate(skf.split(X, y)):
 
 
 # Save Cross Validation Results
-evaluation.save_cross_validation_results(results, project_dir, save_results=True)
+#TODO: save results of crossval for each config mode (text, audio, text_audio)
+evaluation.avg_results_cross_validation(results, project_dir, save_results=True)
 
 
 
