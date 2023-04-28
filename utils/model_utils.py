@@ -3,6 +3,7 @@ from utils.metrics import f1_m, precision_m, recall_m
 from sklearn.utils.class_weight import compute_class_weight
 import os
 import json
+from sklearn.model_selection import cross_validate
 
 
 def compile_model(model, lr=5e-05, loss=tf.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy', f1_m]):
@@ -70,3 +71,5 @@ def save_config(run_path, param_dict):
     # save the dictionary param_dict in a json file with indent = 4
     with open(config_path + '/config.json', 'w') as f:
         json.dump(param_dict, f, indent=4)
+
+
