@@ -12,8 +12,12 @@ def load(base_dir):
 def load_audio(df, base_dir):
     audio_path = os.path.join(base_dir, LOCAL_DATABASE_DIR, 'MM-DatasetFallacies', 'audio_clips')
     train_audio_files = []
+    indexes_train = []
     val_audio_files = []
+    indexes_val = []
     test_audio_files = []
+    indexes_test = []
+
     # Loop through the whole dataframe that extracts the audio features of
     # the first and second sentences of the pair
     for index, row in df.iterrows():
@@ -23,12 +27,15 @@ def load_audio(df, base_dir):
         snippet_path = os.path.join(audio_path, 'snippet', debate_id, clip_id + '.wav')
         if split == 'Train':
             train_audio_files.append(snippet_path)
+            indexes_train.append(index)
         elif split == 'Validation':
             val_audio_files.append(snippet_path)
+            indexes_val.append(index)
         elif split == 'Test':
             test_audio_files.append(snippet_path)
+            indexes_test.append(index)
 
-    return train_audio_files, val_audio_files, test_audio_files
+    return train_audio_files, indexes_train,  val_audio_files, indexes_val, test_audio_files, indexes_test
 
 
 def get_sentences(split, df):
