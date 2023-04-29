@@ -124,7 +124,7 @@ for i, (train, test) in enumerate(skf.split(X, y)):
 
 # Save Cross Validation Results
 #TODO: save results of crossval for each config mode (text, audio, text_audio)
-evaluation.avg_results_cross_validation(results, project_dir, save_results=True)
+evaluation.avg_results_cross_validation(results, project_dir, validation_strategy='cross_val', save_results=True)
 
 
 
