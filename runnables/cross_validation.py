@@ -17,7 +17,7 @@ project_dir = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__fi
 
 
 df = data_loader.load(project_dir)
-train_audio_files, val_audio_files, test_audio_files = data_loader.load_audio(df, project_dir) # snippet audio files
+train_audio_files, indexes_train, val_audio_files, indexes_val, test_audio_files, indexes_test = data_loader.load_audio(df, project_dir) # snippet audio files
 
 Xtrain, ytrain = data_loader.get_sentences(split = 'train', df=df)
 Xval, yval= data_loader.get_sentences(split = 'val', df=df)
@@ -25,9 +25,13 @@ Xval, yval= data_loader.get_sentences(split = 'val', df=df)
 
 print(Xtrain.shape, len(train_audio_files))
 
+# append to each sentence the corresponding audio file
+Xtrain = np.array([Xtrain[i] + 'SENT_AUDIO_SEP' + train_audio_files[i] for i in range(len(Xtrain))])
+Xval = np.array([Xval[i] + 'SENT_AUDIO_SEP' + val_audio_files[i] for i in range(len(Xval))])
 # Concatenate train and val
 X = np.concatenate((Xtrain, Xval), axis=0)
 y = np.concatenate((ytrain, yval), axis=0)
+
 
 # Cross validation
 results = {} # dictionary to store the results as fold : dict of results
@@ -37,15 +41,15 @@ for i, (train, test) in enumerate(skf.split(X, y)):
     print("Running Fold", i+1, "/", n_folds)
     Xtrain, Xval = X[train], X[test]
     ytrain, yval = y[train], y[test]
-    
-    print(train)
-    # get only the audio files corresponding to the train and test indexes
-    train_audio_files = [train_audio_files[k] for k in train]
-    val_audio_files = [val_audio_files[k] for k in test]
 
-    #print(np.unique(ytrain, return_counts=True), np.unique(ytest, return_counts=True))
+    # from Xtrain and Xval separate the audio files from the sentences
+    print(Xtrain[0].split('SENT_AUDIO_SEP')[1])
+    train_audio_files = np.array([Xtrain[k].split('SENT_AUDIO_SEP')[1] for k in range(len(Xtrain))])
+    val_audio_files = np.array([Xval[k].split('SENT_AUDIO_SEP')[1] for k in range(len(Xval))])
+    Xtrain = np.array([Xtrain[k].split('SENT_AUDIO_SEP')[0] for k in range(len(Xtrain))])
+    Xval = np.array([Xval[k].split('SENT_AUDIO_SEP')[0] for k in range(len(Xval))])
 
-    #print(Xtrain.shape, ytrain.shape, Xtest.shape, ytest.shape)
+
 
     encoded_Xtrain, y_train, max_sentence_len = converter.prepare_text_data(Xtrain, ytrain, is_train=True, q=0.99) # 0.99 is the quantile for the max sentence length (99% of the sentences are shorter than this length
     #max_sentence_len = 512 # set the max sentence length to 512 TO BE REMOVED
@@ -121,7 +125,7 @@ for i, (train, test) in enumerate(skf.split(X, y)):
 
 # Save Cross Validation Results
 #TODO: save results of crossval for each config mode (text, audio, text_audio)
-evaluation.avg_results_cross_validation(results, project_dir, save_results=True)
+evaluation.avg_results_cross_validation(results, project_dir, validation_strategy='cross_val', save_results=True)
 
 
 

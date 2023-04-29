@@ -13,7 +13,7 @@ project_dir = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__fi
 
 
 df = data_loader.load(project_dir)
-train_audio_files, val_audio_files, test_audio_files = data_loader.load_audio(df, project_dir) # snippet audio files
+train_audio_files, indexes_train, val_audio_files, indexes_val, test_audio_files, indexes_test = data_loader.load_audio(df, project_dir) # snippet audio files
 
 Xtrain, ytrain = data_loader.get_sentences(split = 'train', df=df)
 Xval, yval= data_loader.get_sentences(split = 'val', df=df)

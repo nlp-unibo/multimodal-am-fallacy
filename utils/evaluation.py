@@ -38,7 +38,7 @@ def save_results(run_path, cr):
         f.write(cr)
 
 
-def avg_results_cross_validation(results, project_dir, save_results = False):
+def avg_results_cross_validation(results, project_dir, validation_strategy = 'cross_val', save_results = False):
     label_0_f1 = []
     label_1_f1 = []
     label_2_f1 = []
@@ -87,7 +87,11 @@ def avg_results_cross_validation(results, project_dir, save_results = False):
         # save mean_results as a json file in the results folder
         # create a 'cross_validation' folder in the results folder if it doesn't exist
         results_path = os.path.join(project_dir, 'results')
-        cross_validation_path = os.path.join(results_path, 'cross_validation')
+        if validation_strategy == 'cross_val':
+            cross_validation_path = os.path.join(results_path, 'cross_validation')
+        elif validation_strategy == 'leave_one_out':
+            cross_validation_path = os.path.join(results_path, 'leave_one_out')
+
         if not os.path.exists(cross_validation_path):
             os.makedirs(cross_validation_path)
 
@@ -95,5 +99,7 @@ def avg_results_cross_validation(results, project_dir, save_results = False):
         
         with open(results_filepath, 'w') as f:
             json.dump(mean_results, f, indent=4)
+
+
 
 
