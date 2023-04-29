@@ -43,7 +43,6 @@ for i, (train, test) in enumerate(skf.split(X, y)):
     ytrain, yval = y[train], y[test]
 
     # from Xtrain and Xval separate the audio files from the sentences
-    print(Xtrain[0].split('SENT_AUDIO_SEP')[1])
     train_audio_files = np.array([Xtrain[k].split('SENT_AUDIO_SEP')[1] for k in range(len(Xtrain))])
     val_audio_files = np.array([Xval[k].split('SENT_AUDIO_SEP')[1] for k in range(len(Xval))])
     Xtrain = np.array([Xtrain[k].split('SENT_AUDIO_SEP')[0] for k in range(len(Xtrain))])
@@ -66,7 +65,7 @@ for i, (train, test) in enumerate(skf.split(X, y)):
 
 
     #config_list = ['audio_only', 'text_only', 'text_audio']
-    config_list = ['audio_only']
+    config_list = ['text_audio']
     config_params = {'epochs': 100,
                     'batch_size': 8,
                     'callbacks': 'early_stopping',
