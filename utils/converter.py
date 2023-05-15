@@ -47,7 +47,7 @@ def prepare_text_data(X, y, text_model='bert', maxSentenceLen = maxBERTLen, is_t
             dataFields['token_type_ids'].append(padded[-1])
 
         for key in dataFields:
-            dataFields[key] = np.array(dataFields[key])
+            dataFields[key] = np.array(dataFields[key]) 
 
 
         y_enc = np.array(encode_labels(y))
