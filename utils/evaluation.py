@@ -4,20 +4,36 @@ import os
 import numpy as np
 import json
 import pandas as pd
+from utils import converter 
 
 def toLabels(data):
     ypred = tf.argmax(data, axis = 1)
     return ypred
 
+def toEncodedLabels(data):
+    encode_labels = []
+    lbls = {
+        'AppealtoEmotion': 0,
+        'AppealtoAuthority': 1,
+        'AdHominem': 2,
+        'FalseCause': 3,
+        'Slipperyslope': 4,
+        'Slogans': 5
+
+    }
+
+    # check if y is equal to the value of lbls and add the key to the list
+    for i in range(len(data)):
+        for key, value in lbls.items():
+            if data[i] == value:
+                encode_labels.append(key)
+    return encode_labels
+
 def evaluate_model(model, test_data, cross_val=False):
     Xtest, ytest = test_data
     y_pred = model.predict(Xtest)
     ypred = toLabels(y_pred)
-    #print("YPred", ypred)
-    #print("Ytest", ytest)
-    #ytest = toLabels(ytest)
-    # with open('/home/alex/data2/auditory-fallacies-test/auditory-fallacies/test_bert_text/results/reports_sentences_with_cw_rep' + str(repetition) +'encplus'+ '_pre_pre'+ '.txt', 'w') as f:
-    #   f.write(classification_report(ytest, y_pred = ypred)+ "\n")
+
     if cross_val==True:
         cr = classification_report(ytest, y_pred=ypred, output_dict=True)
     else:
@@ -39,20 +55,7 @@ def save_results(run_path, cr):
         f.write(cr)
 
 
-def avg_results_cross_validation(results, project_dir, validation_strategy = 'cross_val', config = 'text_only', save_results = False):
-    # label_0_f1 = []
-    # label_1_f1 = []
-    # label_2_f1 = []
-    # label_3_f1 = []
-    # label_4_f1 = []
-    # label_5_f1 = []
-    # accuracy = []
-    # macro_avg = []
-    # weighted_avg = []
-
-    # compute the average precision for each label among the folds
-    # build a dataframe where each row is a label (0, 1, 2, 3, 4, 5) and each column is a fold
-    # compute the mean of each row
+def avg_results_cross_validation(results, run_path, validation_strategy = 'cross_val', config = 'text_only', save_results = False):
 
     labels = ['0', '1', '2', '3', '4', '5', 'accuracy', 'macro avg', 'weighted avg']
     int_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -63,7 +66,6 @@ def avg_results_cross_validation(results, project_dir, validation_strategy = 'cr
     for fold in folds:
         for label in labels:
             if label in results[fold].keys():
-                print(label)
                 if label != 'accuracy': 
                     #print(results[fold][label]['f1-score'])
                     df.loc[label, fold] = round(results[fold][label]['f1-score'],4)
@@ -79,71 +81,12 @@ def avg_results_cross_validation(results, project_dir, validation_strategy = 'cr
     # compute the standard deviation of each row
     df['std'] = df.std(axis=1)
 
-    #print(df.head())
+    print(df.head())
 
-    # print(results.items())
-    # for k, v in results.items():
-    #     label_0_f1.append(v['0']['f1-score'])
-    #     label_1_f1.append(v['1']['f1-score'])
-    #     label_2_f1.append(v['2']['f1-score'])
-    #     label_3_f1.append(v['3']['f1-score'])
-    #     label_4_f1.append(v['4']['f1-score'])
-    #     label_5_f1.append(v['5']['f1-score'])
-    #     accuracy.append(v['accuracy'])
-    #     macro_avg.append(v['macro avg']['f1-score'])
-    #     weighted_avg.append(v['weighted avg']['f1-score'])
-
-    # print('Label 0 F1: ', np.mean(label_0_f1))
-    # print('Label 1 F1: ', np.mean(label_1_f1))
-    # print('Label 2 F1: ', np.mean(label_2_f1))
-    # print('Label 3 F1: ', np.mean(label_3_f1))
-    # print('Label 4 F1: ', np.mean(label_4_f1))
-    # print('Label 5 F1: ', np.mean(label_5_f1))
-    # print('Accuracy: ', np.mean(accuracy))
-    # print('Macro Avg: ', np.mean(macro_avg))
-    # print('Weighted Avg: ', np.mean(weighted_avg))
-
-    # # Store all the means in a new dictionary
-    # mean_results = {'label_0_f1': np.mean(label_0_f1),
-    #                 'label_1_f1': np.mean(label_1_f1),
-    #                 'label_2_f1': np.mean(label_2_f1),
-    #                 'label_3_f1': np.mean(label_3_f1),
-    #                 'label_4_f1': np.mean(label_4_f1),
-    #                 'label_5_f1': np.mean(label_5_f1),
-    #                 'accuracy': np.mean(accuracy),
-    #                 'macro_avg': np.mean(macro_avg),
-    #                 'weighted_avg': np.mean(weighted_avg)}
-    
-    # # Store the stdev of the results in a new dictionary
-    # stdev_results = {'label_0_f1': np.std(label_0_f1),
-    #                 'label_1_f1': np.std(label_1_f1),
-    #                 'label_2_f1': np.std(label_2_f1),
-    #                 'label_3_f1': np.std(label_3_f1),
-    #                 'label_4_f1': np.std(label_4_f1),
-    #                 'label_5_f1': np.std(label_5_f1),
-    #                 'accuracy': np.std(accuracy),
-    #                 'macro_avg': np.std(macro_avg),
-    #                 'weighted_avg': np.std(weighted_avg)}
-    
     if save_results == True:
-        # save mean_results as a json file in the results folder
-        # create a 'cross_validation' folder in the results folder if it doesn't exist
-        results_path = os.path.join(project_dir, 'results')
-        if validation_strategy == 'cross_val':
-            cross_validation_path = os.path.join(results_path, 'cross_validation')
-        elif validation_strategy == 'leave_one_out':
-            cross_validation_path = os.path.join(results_path, 'leave_one_out')
 
-        if not os.path.exists(cross_validation_path):
-            os.makedirs(cross_validation_path)
-
-        # create a folder for the current configuration if it doesn't exist
-        config_path = os.path.join(cross_validation_path, config)
-        if not os.path.exists(config_path):
-            os.makedirs(config_path)
-        
-        results_filepath_json = os.path.join(config_path, 'results.json')
-        results_filepath_csv = os.path.join(config_path, 'results.csv')
+        results_filepath_json = os.path.join(run_path, 'results.json')
+        results_filepath_csv = os.path.join(run_path, 'results.csv')
         # save df as a json file in the results folder
         df.to_json(results_filepath_json, indent=4)
 
@@ -151,16 +94,60 @@ def avg_results_cross_validation(results, project_dir, validation_strategy = 'cr
         df.to_csv(results_filepath_csv, index=True)
 
 
-        # results_filepath_mean = os.path.join(config_path, 'mean_results.json') 
-        # results_filepath_stdev = os.path.join(config_path, 'stdev_results.json')
-
-        # with open(results_filepath_mean, 'w') as f:
-        #     json.dump(mean_results, f, indent=4)
-        
-        # with open(results_filepath_stdev, 'w') as f:
-        #     json.dump(stdev_results, f, indent=4)
 
 
 
+def make_predictions(model, test_data): 
+    # make predictions on the test set
+    Xtest, ytest = test_data
+    y_pred = model.predict(Xtest)  
+    ypred = toLabels(y_pred) 
+
+    # convert the encoded labels to the original labels
+    ypred_encoded = toEncodedLabels(ypred)
+    ytest_encoded = toEncodedLabels(ytest)
+
+    return ypred_encoded, ytest_encoded, ypred, ytest
+
+def save_predictions(run_path, df_results, debate_id, test_snippet, test_sentence_snippet,  ypred_encoded, ytrue_encoded, ypred, ytrue):
+    # add the predictions to the dataframe by saving also the snippet and the sentence snippet and the debate id
+
+    #if df_results is empty, associate the columns to the dataframe, otherwise append the new predictions to the dataframe
+    if df_results.empty:
 
 
+        df_results['Snippet'] = test_snippet
+        df_results['SentenceSnippet'] = test_sentence_snippet
+        df_results['Dialogue ID'] = debate_id
+        df_results['y_pred_encoded'] = ypred_encoded
+        df_results['y_true_encoded'] = ytrue_encoded
+        df_results['y_pred'] = ypred
+        df_results['y_true'] = ytrue
+    else:
+
+        # create a new dataframe with the new predictions and append it to the existing one
+        df_new = pd.DataFrame(columns=['Dialogue ID', 'SentenceSnippet', 'Snippet', 'y_pred', 'y_true', 'y_pred_encoded', 'y_true_encoded'])
+        df_new['Snippet'] = test_snippet
+        df_new['SentenceSnippet'] = test_sentence_snippet
+        df_new['Dialogue ID'] = debate_id
+        df_new['y_pred_encoded'] = ypred_encoded
+        df_new['y_true_encoded'] = ytrue_encoded
+        df_new['y_pred'] = ypred
+        df_new['y_true'] = ytrue
+
+        df_results = pd.concat([df_results, df_new], ignore_index=True)
+
+    
+    # save predictions as .json file
+    results_path = os.path.join(run_path, 'predictions')
+    results_filepath_json = os.path.join(run_path, 'predictions.json')
+    results_filepath_csv = os.path.join(run_path, 'predictions.csv')
+
+    if not os.path.exists(run_path):
+        os.makedirs(run_path)
+
+    print(df_results.head())
+    df_results.to_json(results_filepath_json, indent=4)
+    df_results.to_csv(results_filepath_csv, index=True)
+
+    return df_results

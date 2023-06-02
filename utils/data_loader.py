@@ -45,7 +45,7 @@ def get_sentences(split, df):
         df = df[df['Split'] == 'Validation']
     elif split == 'test':
         df = df[df['Split'] == 'Test']
-    return df['SentenceSnippet'].values, df['Fallacy'].values
+    return df['SentenceSnippet'].values, df['Snippet'], df['Fallacy'].values
 
 def get_unique_labels(y):
     return np.unique(y)
