@@ -42,6 +42,22 @@ def evaluate_model(model, test_data, cross_val=False):
     return cr
 
 
+def evaluate_baseline(model, test_data, cross_val=False):
+    Xtest, ytest = test_data
+    ypred = model.predict(ytest)
+    print(ypred)
+    #ypred = toLabels(y_pred)
+    print(ytest)
+
+    if cross_val==True:
+        cr = classification_report(ytest, y_pred=ypred, output_dict=True)
+    else:
+        cr = classification_report(ytest, y_pred=ypred, output_dict=False)
+        print(cr + "\n")
+    return cr
+
+
+
 def save_results(run_path, cr):
     #path = os.path.join(project_dir, 'results')
     # save classification report as .json file
@@ -108,6 +124,25 @@ def make_predictions(model, test_data):
     ytest_encoded = toEncodedLabels(ytest)
 
     return ypred_encoded, ytest_encoded, ypred, ytest
+
+def make_predictions_baseline(model, test_data): 
+    # make predictions on the test set
+    Xtest, ytest = test_data
+    ypred = model.predict(ytest)  
+    #ypred = toLabels(y_pred) 
+    
+
+    # convert the encoded labels to the original labels
+    ypred_encoded = toEncodedLabels(ypred)
+    ytest_encoded = toEncodedLabels(ytest)
+
+
+
+
+    return ypred_encoded, ytest_encoded, ypred, ytest
+
+
+
 
 def save_predictions(run_path, df_results, debate_id, test_snippet, test_sentence_snippet,  ypred_encoded, ytrue_encoded, ypred, ytrue):
     # add the predictions to the dataframe by saving also the snippet and the sentence snippet and the debate id

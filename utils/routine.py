@@ -3,6 +3,9 @@ import os
 import numpy as np
 import tensorflow as tf
 import pandas as pd
+import sklearn
+from sklearn.dummy import DummyClassifier
+
 
 
 
@@ -75,7 +78,7 @@ def leave_one_out(dialogue_ids, df, project_dir, run_path, config, config_params
                                                     )
 
 
-        print(model.summary())
+        #print(model.summary())
         # Multimodal
         if config == 'text_audio':
             train_data = ([encoded_Xtrain, encoded_audio_train], y_train)
@@ -114,6 +117,68 @@ def leave_one_out(dialogue_ids, df, project_dir, run_path, config, config_params
     
         # make predictions
         ypred_encoded, ytrue_encoded, ypred, ytrue= evaluation.make_predictions(trained_model, test_data)
+
+        # save predictions
+        predictions = evaluation.save_predictions(run_path, predictions, dialogue_id, test_snippet, test_sentence_snippet, ypred_encoded, ytrue_encoded, ypred, ytrue)
+
+        n_dial+=1 # increment the counter
+    return results # return the results dictionary
+
+
+
+
+
+def leave_one_out_baselines(dialogue_ids, df, project_dir, run_path, config, config_params, model):
+    results = {} # dictionary to store the results as fold : dict of results
+    n_dial = 0 # counter for the number of dialogues
+    # create empty dataframe predictions to store the predictions for each fold
+    predictions = pd.DataFrame(columns=['Dialogue ID', 'SentenceSnippet', 'Snippet', 'y_pred', 'y_true', 'y_pred_encoded', 'y_true_encoded'])
+
+    # iterate over dialogue IDs
+    for dialogue_id in dialogue_ids:
+        # if n_dial == 2:
+        #      break
+        print("Running cross validation for dialogue ID: {}".format(dialogue_id))
+        # print some separation lines
+        print("--------------------------------------------------")
+        # mark the 'Split' column as 'Test' for the current dialogue ID
+        df.loc[df['Dialogue ID'] == dialogue_id, 'Split'] = 'Test'
+        # create a list of dialogue IDs that are not the current one
+        train_dialogue_ids = [id for id in dialogue_ids if id != dialogue_id]
+        # mark the 'Split' column as 'Train' for the remaining dialogue IDs
+        df.loc[df['Dialogue ID'].isin(train_dialogue_ids), 'Split'] = 'Train'
+
+        train_audio_files, indexes_train, val_audio_files, indexes_val, test_audio_files, indexes_test = data_loader.load_audio(df, project_dir)  # snippet audio files
+
+
+        Xtrain, train_snippet, ytrain = data_loader.get_sentences(split='train', df=df)
+        Xtest, test_snippet, ytest = data_loader.get_sentences(split='test', df=df)
+
+        train_sentence_snippet = Xtrain
+        test_sentence_snippet = Xtest
+
+        ytrain = converter.encode_labels(ytrain)
+        ytest = converter.encode_labels(ytest)
+
+        test_data = (ytest, ytest)
+
+        # Compile Model
+        seed = reproducibility.set_reproducibility()
+        dummy_clf = DummyClassifier(strategy=model, random_state=seed)
+        
+
+        # Train Model
+        trained_model = dummy_clf.fit(ytrain, ytrain)
+          
+
+        cr = evaluation.evaluate_baseline(trained_model, test_data, cross_val=True)
+        print(cr)
+        #print("Cross Validation Results for dialogue ID: {}".format(dialogue_id))
+        #print(cr)
+        results[dialogue_id] = cr
+    
+        # make predictions
+        ypred_encoded, ytrue_encoded, ypred, ytrue = evaluation.make_predictions_baseline(trained_model, test_data)
 
         # save predictions
         predictions = evaluation.save_predictions(run_path, predictions, dialogue_id, test_snippet, test_sentence_snippet, ypred_encoded, ytrue_encoded, ypred, ytrue)

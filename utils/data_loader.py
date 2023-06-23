@@ -4,6 +4,7 @@ import numpy as np
 
 LOCAL_DATABASE_DIR = 'local_database'
 def load(base_dir):
+    #df_path = os.path.join(base_dir, LOCAL_DATABASE_DIR, 'MM-DatasetFallacies', 'no_duplicates', 'dataset_dial.csv') # change if you want to use full, partial or full-no-duplicates dataset
     df_path = os.path.join(base_dir, LOCAL_DATABASE_DIR, 'MM-DatasetFallacies', 'no_duplicates', 'dataset.csv') # change if you want to use full, partial or full-no-duplicates dataset
     df = pd.read_csv(df_path, sep='\t')
     return df

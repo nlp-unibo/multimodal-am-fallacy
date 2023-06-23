@@ -12,7 +12,7 @@ def bert_model( num_labels, config='text_only', is_trainable=False, max_sentence
         input_ids = tf.keras.layers.Input(shape=(max_sentence_len,), dtype=tf.int32)
         token_type_ids = tf.keras.layers.Input(shape=(max_sentence_len,), dtype=tf.int32)
         attention_mask = tf.keras.layers.Input(shape=(max_sentence_len,), dtype=tf.int32)
-        bertModel = TFBertModel.from_pretrained("bert-base-uncased")(input_ids, token_type_ids=token_type_ids,
+        bertModel = TFBertModel.from_pretrained("bert-base-uncased", trainable=False)(input_ids, token_type_ids=token_type_ids,
                                                                      attention_mask=attention_mask)[-1] #-1 is the pooled output
 
         text_emb = tf.keras.layers.Dropout(rate=dropout_text)(bertModel)
@@ -95,7 +95,7 @@ def roberta_model(num_labels, config='text_only', is_trainable=True, max_sentenc
         # print(robertaModel[-1].shape)
         # print(robertaModel[1][0].shape)
     
-        robertaModel = TFRobertaModel.from_pretrained("roberta-base")(input_ids, attention_mask=attention_mask)[-1] #-1 is the pooled output
+        robertaModel = TFRobertaModel.from_pretrained("roberta-base", trainable=False)(input_ids, attention_mask=attention_mask)[-1] #-1 is the pooled output
         # #reshaped_tensor = tf.reshape(robertaModel, shape=[-1, robertaModel.shape[0]])
         # expanded_tensor = tf.expand_dims(robertaModel, axis=0)
         # shape_list = expanded_tensor.shape.as_list()

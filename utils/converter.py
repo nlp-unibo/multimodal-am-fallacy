@@ -77,10 +77,21 @@ def prepare_text_data(X, y, text_model='bert', maxSentenceLen = maxBERTLen, is_t
         data = tokenizer.encode_plus(X[i].strip(), truncation=True)
         if text_model == 'bert':
             padded = pad([data['input_ids'], data['attention_mask'], data['token_type_ids']], padding = 'post', truncating = 'post', maxlen = maxSentenceLen)
+            dataFields['input_ids'].append(padded[0])
+            dataFields['attention_mask'].append(padded[1])
+        
         elif text_model == 'roberta':
-            padded = pad([data['input_ids'], data['attention_mask']], padding = 'post', truncating = 'post', maxlen = maxSentenceLen)
-        dataFields['input_ids'].append(padded[0])
-        dataFields['attention_mask'].append(padded[1])
+            input_ids = data['input_ids'] + [tokenizer.pad_token_id] * (maxSentenceLen - len(data['input_ids']))
+            input_ids = input_ids[:maxSentenceLen]
+
+            attention_mask = data['attention_mask'] + [0] * (maxSentenceLen - len(data['attention_mask']))
+            attention_mask = attention_mask[:maxSentenceLen]
+
+            dataFields['input_ids'].append(input_ids)
+            dataFields['attention_mask'].append(attention_mask)
+
+
+        
         if text_model == 'bert':
             dataFields['token_type_ids'].append(padded[-1])
 

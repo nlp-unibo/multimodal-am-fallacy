@@ -18,7 +18,7 @@ import tensorflow as tf
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
   try:
-    tf.config.set_visible_devices(gpus[0], 'GPU')
+    tf.config.set_visible_devices(gpus[1], 'GPU')
     for gpu in gpus:
       tf.config.experimental.set_memory_growth(gpu, True)
     logical_gpus = tf.config.list_logical_devices('GPU')
@@ -32,24 +32,16 @@ if gpus:
 seed = reproducibility.set_reproducibility()
 
 # Model and Training Parameters
-text_model = 'bert'
-audio_model = 'clap'
-if audio_model == 'wav2vec':
-    sample_rate = 16000
-    max_frame_len = 768 # to check
-elif audio_model == 'clap': 
-    sample_rate = 48000 # 16000 for wav2vec, 48000 for clap
-    max_frame_len = 512 # to check 
+model = 'uniform'
 
-
-
-config = 'text_only'
-config_params = {'text_model': text_model,
-                'audio_model': audio_model,
+config = 'baseline'
+sample_rate = 0 # not used
+max_frame_len = 0 # not used
+config_params = {'model': model,
                 'sample_rate': sample_rate,
                 'is_text_model_trainable': False, 
-                'epochs': 15, #500
-                'batch_size': 32, #8 
+                'epochs': 10, #500
+                'batch_size': 8, #8 
                 'callbacks': 'early_stopping',
                 'use_class_weights': True,
                 'seed': seed,
@@ -62,7 +54,7 @@ config_params = {'text_model': text_model,
 #project_dir = os.path.normpath(os.path.dirname(os.path.abspath(__file__)))
 project_dir = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
 df = data_loader.load(project_dir)
-
+ 
 # get unique dialogue IDs
 dialogue_ids = df['Dialogue ID'].unique()
 
@@ -71,7 +63,7 @@ run_path = model_utils.create_run_path(project_dir, 'leave_one_out', config)
 
 
 # leave one out cross validation
-results = routine.leave_one_out(dialogue_ids, df, project_dir, run_path, config, config_params, text_model, audio_model, sample_rate)
+results = routine.leave_one_out_baselines(dialogue_ids, df, project_dir, run_path, config, config_params, model)
 
 # Save Cross Validation Results
 # TODO: save results of crossval for each config mode (text, audio, text_audio)
