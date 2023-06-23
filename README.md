@@ -1,9 +1,9 @@
 # Multimodal Fallacy Classification in  Political Debates
 This repository contains the code and resources for the project "Multimodal Fallacy Classification in Argument Mining," focusing on the exploration of audio's role in classifying argumentative fallacies in political debates.
 
-## Dataset: MM-USED Fallacies
+## Dataset: MM-USED-fallacies
 
-The repository includes the code required to generate the MM-USED fallacies dataset. This dataset is created by leveraging resources from the MM-USED dataset and the USED-fallacy dataset. By incorporating multimodal techniques, we aim to enrich the fallacy analysis beyond traditional text-based information, specifically by incorporating audio data from political debates.
+The repository includes the code required to generate the MM-USED-fallacies dataset. This dataset is created by leveraging resources from the [MM-USED](https://github.com/federicoruggeri/multimodal-am/tree/main/multimodal-dataset) dataset and the [USED-fallacy](https://github.com/pierpaologoffredo/IJCAI2022) dataset. By incorporating multimodal techniques, we aim to enrich the fallacy analysis beyond traditional text-based information, specifically by incorporating audio data from political debates.
 
 ## Repository Structure
 
