@@ -202,4 +202,3 @@ def encode_labels(y):
 def get_max_sentence_len(input_ids, q = 0.99):
     return min(int(np.quantile([len(x) for x in input_ids], q=q)), maxBERTLen)
 
-

@@ -5,6 +5,72 @@ maxBERTLen = 512
 maxFrameLen = 768 # embedding shape wav2vec
 #TODO: add code for bert trainable
 
+
+def build_model(num_labels,
+                embedding_dim=768,
+                dropout_text=0.1,
+                answer_units=100,
+                max_frame_len=maxFrameLen,
+                config='text_only'):
+    # Text
+    if config == 'text_only':
+        embeddings = tf.keras.layers.Input(shape=(embedding_dim,), dtype=tf.float32)
+        text_emb = tf.keras.layers.Dropout(rate=dropout_text)(embeddings)
+        answer = tf.keras.layers.Dense(units=answer_units)(text_emb)
+        dense = tf.keras.layers.Dense(units=answer_units / 2)(answer)
+        dense = tf.keras.layers.Dense(units=num_labels)(dense)
+        bn = tf.keras.layers.BatchNormalization()(dense)
+        dropout = tf.keras.layers.Dropout(0.1)(bn)
+        out = tf.keras.layers.Dense(num_labels)(dropout)
+        model = tf.keras.Model(inputs=[embeddings], outputs=out)
+
+        return model
+    
+    # Audio
+    elif config == 'audio_only':
+        audio_input = tf.keras.layers.Input(shape=(max_frame_len,))
+        audio_emb = tf.keras.layers.Lambda(lambda x: tf.expand_dims(x, axis=1))(audio_input)
+        audio_lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units=64,
+                                                                        kernel_regularizer=tf.keras.regularizers.l2(
+                                                                            l2=0.0005)))(audio_emb)
+        audio_emb = tf.keras.layers.Dropout(rate=dropout_text)(audio_lstm)
+        answer = tf.keras.layers.Dense(units=answer_units)(audio_emb)
+        dense = tf.keras.layers.Dense(units=answer_units / 2)(answer)
+        dense = tf.keras.layers.Dense(units=num_labels)(dense)
+        bn = tf.keras.layers.BatchNormalization()(dense)
+        dropout = tf.keras.layers.Dropout(0.1)(bn)
+        out = tf.keras.layers.Dense(num_labels)(dropout)
+        model = tf.keras.Model(inputs=[audio_input], outputs=out)
+
+        return model
+
+    # Text-Audio
+    elif config == 'text_audio':
+        embeddings = tf.keras.layers.Input(shape=(embedding_dim,), dtype=tf.float32)
+        text_emb = tf.keras.layers.Dropout(rate=dropout_text)(embeddings)
+
+        audio_input = tf.keras.layers.Input(shape=(max_frame_len,))
+        audio_emb = tf.keras.layers.Lambda(lambda x: tf.expand_dims(x, axis=1))(audio_input)
+        audio_lstm = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(units=64,
+                                                                        kernel_regularizer=tf.keras.regularizers.l2(
+                                                                            l2=0.0005)))(audio_emb)
+        audio_emb = tf.keras.layers.Dropout(rate=dropout_text)(audio_lstm)
+
+        stacked_features = tf.concat((text_emb, audio_emb), axis=-1)
+
+        answer = tf.keras.layers.Dense(units=answer_units)(stacked_features)
+        dense = tf.keras.layers.Dense(units=answer_units / 2)(answer)
+        dense = tf.keras.layers.Dense(units=num_labels)(dense)
+        bn = tf.keras.layers.BatchNormalization()(dense)
+        dropout = tf.keras.layers.Dropout(0.1)(bn)
+        out = tf.keras.layers.Dense(num_labels)(dropout)
+        model = tf.keras.Model(inputs=[embeddings, audio_input], outputs=out)
+
+        return model
+
+
+
+
 def bert_model( num_labels, config='text_only', is_trainable=False, max_sentence_len=maxBERTLen, max_frame_len = maxFrameLen,  dropout_text=0.1, answer_units=100, audio_units=64, audio_l2=0.0005, dropout_audio=0.1):
     # Text
     if config != 'audio_only':
@@ -12,7 +78,7 @@ def bert_model( num_labels, config='text_only', is_trainable=False, max_sentence
         input_ids = tf.keras.layers.Input(shape=(max_sentence_len,), dtype=tf.int32)
         token_type_ids = tf.keras.layers.Input(shape=(max_sentence_len,), dtype=tf.int32)
         attention_mask = tf.keras.layers.Input(shape=(max_sentence_len,), dtype=tf.int32)
-        bertModel = TFBertModel.from_pretrained("bert-base-uncased", trainable=False)(input_ids, token_type_ids=token_type_ids,
+        bertModel = TFBertModel.from_pretrained("bert-base-uncased", trainable=True)(input_ids, token_type_ids=token_type_ids,
                                                                      attention_mask=attention_mask)[-1] #-1 is the pooled output
 
         text_emb = tf.keras.layers.Dropout(rate=dropout_text)(bertModel)
@@ -95,7 +161,7 @@ def roberta_model(num_labels, config='text_only', is_trainable=True, max_sentenc
         # print(robertaModel[-1].shape)
         # print(robertaModel[1][0].shape)
     
-        robertaModel = TFRobertaModel.from_pretrained("roberta-base", trainable=False)(input_ids, attention_mask=attention_mask)[-1] #-1 is the pooled output
+        robertaModel = TFRobertaModel.from_pretrained("roberta-base", trainable=True)(input_ids, attention_mask=attention_mask)[-1] #-1 is the pooled output
         # #reshaped_tensor = tf.reshape(robertaModel, shape=[-1, robertaModel.shape[0]])
         # expanded_tensor = tf.expand_dims(robertaModel, axis=0)
         # shape_list = expanded_tensor.shape.as_list()

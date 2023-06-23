@@ -1,4 +1,4 @@
-from utils import data_loader, converter, model_implementation, model_utils, reproducibility, evaluation, routine
+from utils import data_loader, converter_freezed, model_implementation, model_utils, reproducibility, evaluation, routine_freezed
 import os
 import numpy as np
 import tensorflow as tf
@@ -18,7 +18,7 @@ import tensorflow as tf
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
   try:
-    tf.config.set_visible_devices(gpus[0], 'GPU')
+    tf.config.set_visible_devices(gpus[1], 'GPU')
     for gpu in gpus:
       tf.config.experimental.set_memory_growth(gpu, True)
     logical_gpus = tf.config.list_logical_devices('GPU')
@@ -44,33 +44,19 @@ elif audio_model == 'clap':
 
 
 config = 'text_audio'
-if config == 'text_only':
-  config_params = {'text_model': text_model,
-                  'audio_model': 'None',
-                  'sample_rate': sample_rate,
-                  'is_text_model_trainable': True, 
-                  'epochs': 100, #500
-                  'batch_size': 32, #8 
-                  'callbacks': 'early_stopping',
-                  'use_class_weights': True,
-                  'seed': seed,
-                  'lr':5e-05, #1e-03
-                  'max_frame_len': max_frame_len, #512
-                  'config': config} #5e-05
+config_params = {'text_model': text_model,
+                'audio_model': audio_model,
+                'sample_rate': sample_rate,
+                'is_text_model_trainable': False, 
+                'epochs': 100, #500
+                'batch_size': 32, #8 
+                'callbacks': 'none',
+                'use_class_weights': True,
+                'seed': seed,
+                'lr':1e-03, #1e-03
+                'max_frame_len': max_frame_len, #512
+                'config': config} #5e-05
 
-else: 
-  config_params = {'text_model': text_model,
-                  'audio_model': audio_model,
-                  'sample_rate': sample_rate,
-                  'is_text_model_trainable': False, 
-                  'epochs': 100, #500
-                  'batch_size': 32, #8 
-                  'callbacks': 'early_stopping',
-                  'use_class_weights': True,
-                  'seed': seed,
-                  'lr':5e-05, #1e-03
-                  'max_frame_len': max_frame_len, #512
-                  'config': config}
 
 #project_dir = os.path.normpath(os.path.dirname(os.path.abspath(__file__)))
 project_dir = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
@@ -85,7 +71,7 @@ model_utils.save_config(run_path, config_params)
 
 
 # leave one out cross validation
-results = routine.leave_one_out(dialogue_ids, df, project_dir, run_path, config, config_params, text_model, audio_model, sample_rate)
+results = routine_freezed.leave_one_out(dialogue_ids, df, project_dir, run_path, config, config_params, text_model, audio_model, sample_rate)
 
 # Save Cross Validation Results
 # TODO: save results of crossval for each config mode (text, audio, text_audio)

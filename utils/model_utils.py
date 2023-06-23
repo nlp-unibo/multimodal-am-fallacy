@@ -23,8 +23,10 @@ def train_model(model, train_dataset, val_dataset, epochs=100, batch_size=8, cal
         weights = compute_class_weight(class_weight='balanced', classes=[0, 1, 2, 3, 4, 5], y=train_dataset[1])  #TODO: change this to the actual labels or to a generalizable code
         class_weights = {0: weights[0], 1: weights[1], 2: weights[2], 3: weights[3], 4: weights[4], 5: weights[5]}
         model.fit(Xtrain, ytrain, validation_data=val_dataset, epochs=epochs, batch_size=batch_size, callbacks=callbacks, class_weight=class_weights)
+        #model.fit(Xtrain, ytrain, validation_data=val_dataset, epochs=epochs, batch_size=batch_size, class_weight=class_weights)
     else:
         model.fit(Xtrain, ytrain, validation_data=val_dataset, epochs=epochs, batch_size=batch_size, callbacks=callbacks)
+        #model.fit(Xtrain, ytrain, validation_data=val_dataset, epochs=epochs, batch_size=batch_size,  class_weight=class_weights)
     
     return model    
 
