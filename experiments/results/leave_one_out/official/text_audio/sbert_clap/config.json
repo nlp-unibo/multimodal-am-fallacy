@@ -1,0 +1,14 @@
+{
+    "text_model": "sbert",
+    "audio_model": "clap",
+    "sample_rate": 48000,
+    "is_text_model_trainable": false,
+    "epochs": 500,
+    "batch_size": 8,
+    "callbacks": "early_stopping",
+    "use_class_weights": true,
+    "seed": 15371,
+    "lr": 5e-05,
+    "max_frame_len": 512,
+    "config": "text_audio"
+}

@@ -1,0 +1,12 @@
+{
+    "text_model": "bert-base-uncased",
+    "audio_model": "wav2vec2-base-960h",
+    "is_text_model_trainable": true,
+    "epochs": 500,
+    "batch_size": 8,
+    "callbacks": "early_stopping",
+    "use_class_weights": true,
+    "seed": 15371,
+    "lr": 5e-05,
+    "config": "audio_only"
+}
