@@ -222,13 +222,8 @@ def roberta_model(num_labels, config='text_only', is_trainable=True, max_sentenc
         answer = tf.keras.layers.Dense(units=answer_units)(audio_emb)
         dense = tf.keras.layers.Dense(units=answer_units/2)(answer)
         dense = tf.keras.layers.Dense(units=num_labels)(dense)
-        #dense = tf.keras.layers.Dense(units=num_labels)(answer) #TODO: eventually remove it
         bn = tf.keras.layers.BatchNormalization()(dense)
-        #dense = tf.keras.layers.Dense(units=num_labels)(answer)  # TODO: eventually remove it
-        #bn = tf.keras.layers.BatchNormalization()(answer)
 
-        #dense = tf.keras.layers.Dense(units=num_labels)(answer)  # TODO: eventually remove it
-        #bn = tf.keras.layers.BatchNormalization()(dense)
         out = tf.keras.layers.Dense(num_labels, activation=tf.nn.relu)(tf.keras.layers.Dropout(0.1)(bn))
         model = tf.keras.Model(inputs=[audio_input], outputs=out)
 
@@ -256,7 +251,6 @@ def sbert_model(num_labels, config='text_only', is_trainable=True, max_sentence_
                                                                             l2=audio_l2)))(audio_emb)
 
 
-        #audio_emb = tf.keras.layers.Reshape( [audio_lstm.shape[0], -1])(audio_lstm)
         audio_emb = tf.keras.layers.Dropout(rate=dropout_audio)(audio_lstm)
 
 
@@ -267,12 +261,7 @@ def sbert_model(num_labels, config='text_only', is_trainable=True, max_sentence_
         answer = tf.keras.layers.Dense(units=answer_units)(stacked_features)
         dense = tf.keras.layers.Dense(units=answer_units/2)(answer)
         dense = tf.keras.layers.Dense(units=num_labels)(dense)
-        #dense = tf.keras.layers.Dense(units=num_labels)(answer) #TODO: eventually remove it
         bn = tf.keras.layers.BatchNormalization()(dense)
-        #dense = tf.keras.layers.Dense(units=num_labels)(answer)  # TODO: eventually remove it
-        #bn = tf.keras.layers.BatchNormalization()(answer)
-        
-        #bn = tf.keras.layers.BatchNormalization()(dense)
         out = tf.keras.layers.Dense(num_labels, activation=tf.nn.relu)(tf.keras.layers.Dropout(0.1)(bn))
         model = tf.keras.Model(inputs=[ encoded_input, audio_input], outputs=out)
         return model
@@ -282,10 +271,7 @@ def sbert_model(num_labels, config='text_only', is_trainable=True, max_sentence_
         answer = tf.keras.layers.Dense(units=answer_units)(text_emb)
         dense = tf.keras.layers.Dense(units=answer_units/2)(answer)
         dense = tf.keras.layers.Dense(units=num_labels)(dense)
-        #dense = tf.keras.layers.Dense(units=num_labels)(answer) #TODO: eventually remove it
         bn = tf.keras.layers.BatchNormalization()(dense)
-        #dense = tf.keras.layers.Dense(units=num_labels)(answer)  # TODO: eventually remove it
-        #bn = tf.keras.layers.BatchNormalization()(answer)
         out = tf.keras.layers.Dense(num_labels, activation=tf.nn.relu)(tf.keras.layers.Dropout(0.1)(bn))
         model = tf.keras.Model(inputs=[encoded_input], outputs=out)
 
@@ -296,13 +282,7 @@ def sbert_model(num_labels, config='text_only', is_trainable=True, max_sentence_
         answer = tf.keras.layers.Dense(units=answer_units)(audio_emb)
         dense = tf.keras.layers.Dense(units=answer_units/2)(answer)
         dense = tf.keras.layers.Dense(units=num_labels)(dense)
-        #dense = tf.keras.layers.Dense(units=num_labels)(answer) #TODO: eventually remove it
         bn = tf.keras.layers.BatchNormalization()(dense)
-        #dense = tf.keras.layers.Dense(units=num_labels)(answer)  # TODO: eventually remove it
-        #bn = tf.keras.layers.BatchNormalization()(answer)
-
-        #dense = tf.keras.layers.Dense(units=num_labels)(answer)  # TODO: eventually remove it
-        #bn = tf.keras.layers.BatchNormalization()(dense)
         out = tf.keras.layers.Dense(num_labels, activation=tf.nn.relu)(tf.keras.layers.Dropout(0.1)(bn))
         model = tf.keras.Model(inputs=[audio_input], outputs=out)
 

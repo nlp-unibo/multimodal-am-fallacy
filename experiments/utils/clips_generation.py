@@ -1,12 +1,21 @@
-from utils import alignment_utils as al_utils, clips_generation_utils as cg_utils, data_utils as d_utils, datasets_generation_utils as dg_utils
+from utils import alignment_utils as al_utils, new_clips_generation_utils as cg_utils
 import os 
 from pathlib import Path
 import pandas as pd
 
 sample_rate = 16000 # sample rate used for resampling. 16 kHz is used because wav2vec requires it
 
+# set project dir
+project_dir = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
 
+# set audio clips folder path
+AUDIO_CLIPS_PATH = os.path.join(project_dir, "local_database", "MM-DatasetFallacies", "audio_clips")
 def generate_clips():
+
+    modality = "full" # "full" or "partial"
+    n_files = "all" # "all" or "10"
+
+
     # set project dir 
     project_dir = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
     # set current folder
@@ -15,8 +24,8 @@ def generate_clips():
     current_folder = os.getcwd()
 
     # set resources paths
-    dict_download_links =os.path.join(project_dir, "download", "resources", "download_links.csv")
-    dict_mapping_ids = os.path.join(project_dir, "download", "datasets", "link_ids.csv")
+    dict_download_links =os.path.join(project_dir, "resources", "download",   "download_links.csv")
+    dict_mapping_ids = os.path.join(project_dir, "resources", "download",  "link_ids.csv")
 
     # read the csv files
     df_mapping = pd.read_csv(dict_mapping_ids, sep=';')
@@ -62,76 +71,46 @@ def generate_clips():
             endMin.append(endMin_df[i])
             endSec.append(endSec_df[i])
 
+    if modality == "full":
+        ids = id
+
+    elif modality == "partial":
+        # if modality is partial, the user must specify the number of files to be downloaded
+        # the first n_files in "dictionary.csv" will be downloaded
+        if n_files != "all":
+            n_files = int(n_files)
+            ids = id[:n_files]
+
+
     # create folders for the clips
-    if not os.path.exists('files/audio_clips'):
-        os.makedirs('files/audio_clips')
-    
-    # add a folder for 21_1992
-    if not os.path.exists('files/audio_clips/21_1992'):
-        os.makedirs('files/audio_clips/21_1992')
-    
+    try: 
+        os.makedirs(AUDIO_CLIPS_PATH)
+    except FileExistsError:
+        print("Audio clips folder already exists")
     
 
-
-   
-    output_sentences_dataset_path_csv = 'datasets/trial_sentences_corrected.csv'
-    output_sentences_dataset_path_json = 'datasets/trial_sentences_corrected.json'
-    output_cleaned_dataset_path_json = 'datasets/trial_cleaned.json'
-    output_cleaned_dataset_path_csv = 'datasets/trial_cleaned.csv'
-
-    dataset_dial_sent_clip_csv = 'datasets/dataset_dial_sent_clip.csv'
-    dataset_dial_sent_clip_json = 'datasets/dataset_dial_sent_clip.json'
-
-    corrected_dial_sent_clip_csv = 'datasets/dataset_dial_sent_clip_corrected.csv'
-    corrected_dial_sent_clip_json = 'datasets/dataset_dial_sent_clip_corrected.json'
-   
-    output_snippet_dataset_path_csv = 'datasets/trial_snippet.csv'
-    output_snippet_dataset_path_json = 'datasets/trial_snippet.json'
-
-    output_snippet_dataset_path_csv = 'datasets/trial_snippet.csv'
-    output_snippet_dataset_path_json = 'datasets/trial_snippet.json'
-
-
-    output_comp_dataset_path_csv = 'datasets/trial_comp.csv'
-    output_comp_dataset_path_json = 'datasets/trial_comp.json'
-
-
-    
-    dataset_dial_sent_snippet_clip_csv = 'datasets/dataset_dial_sent_snippet_comp_clip.csv'
-    dataset_dial_sent_snippet_clip_json = 'datasets/dataset_dial_sent_snippet_comp_clip.json'
-
-    dataset_dial_sent_snippet_dialogues_clip_csv = 'datasets/dataset_dial_sent_snippet_comp_dialogues_clip.csv'
-    dataset_dial_sent_snippet_dialogues_clip_json = 'datasets/dataset_dial_sent_snippet_comp_dialogues_clip.json'
-
-    cleaned_dataset_dial_sent_snippet_dialogues_clip_csv = 'datasets/dataset_dial_sent_snippet_comp_dialogues_clip_clean.csv'
-    cleaned_dataset_dial_sent_snippet_dialogues_clip_json = 'datasets/dataset_dial_sent_snippet_comp_dialogues_clip_clean.json'
-   
-    cg_utils.generate_clips_dialogue_sentences(ids, modality, output_cleaned_dataset_path_csv, sample_rate) 
-  
-    cg_utils.generate_clips_snippets(ids, modality, output_snippet_dataset_path_csv, sample_rate) 
-
-
-
-    cg_utils.generate_clips_comps(ids, modality, output_comp_dataset_path_csv, sample_rate)
-  
-
-   
-    cg_utils.generate_clips_dialogues(ids, modality, dataset_dial_sent_snippet_clip_csv, sample_rate)
     
 
+    # generate clips only if AUDIO_CLIPS_PATH is empty
+    if len(os.listdir(AUDIO_CLIPS_PATH)) == 0:
+        base_dir_support_datasets = os.path.join(project_dir,  "resources", "clips_generation")
 
-    # create a copy of the dataset with only the clips for which id_map is in ids
-    if modality == 'partial':
-        final_dataset = pd.read_csv("datasets/MM-DatasetFallacies/dataset.csv", sep = '\t')
-        final_dataset = final_dataset[final_dataset['id_map'].isin(ids)]
-        final_dataset = final_dataset.rename(columns={'id_map': 'Dialogue ID'})
-        final_dataset.to_csv("datasets/MM-DatasetFallacies/dataset_partial.csv", sep = '\t', index=False)
-    else:
-        final_dataset = pd.read_csv("datasets/MM-DatasetFallacies/dataset.csv", sep = '\t')
-        final_dataset = final_dataset.rename(columns={'id_map': 'Dialogue ID'})
-        final_dataset.to_csv("datasets/MM-DatasetFallacies/dataset_full.csv", sep = '\t', index=False)
-"""
-    # copy final dataset into MM-DatasetFallacies folder and if the folder does not exist, create it
-    d_utils.copy_dataset_to_MM_DatasetFallacies_folder('datasets/dataset_dial_sent_snippet_comp_clip.csv', 'datasets/MM-DatasetFallacies') """
+        output_cleaned_dataset_path_csv = os.path.join(base_dir_support_datasets, 'trial_cleaned.csv')
+        output_snippet_dataset_path_csv = os.path.join(base_dir_support_datasets, 'trial_snippet.csv')
+        output_comp_dataset_path_csv = os.path.join(base_dir_support_datasets, 'trial_comp.csv')
+
+        dataset_dial_sent_snippet_clip_csv = os.path.join(base_dir_support_datasets, 'dataset_dial_sent_snippet_comp_clip.csv')
+
+    
+        # generate clips for sentences
+    
+        cg_utils.generate_clips("dial_sent", ids, modality, output_cleaned_dataset_path_csv, sample_rate) 
+    
+        cg_utils.generate_clips("snippet", ids, modality, output_snippet_dataset_path_csv, sample_rate) 
+
+        #cg_utils.generate_clips("comp", ids, modality, output_comp_dataset_path_csv, sample_rate) #TODO: add datasets for clips components generation (from generation/ folder)
+    
+        # cg_utils.generate_clips("dial", ids, modality, dataset_dial_sent_snippet_clip_csv, sample_rate) #TODO: fix dialogues generation (from generation/ folder)
+        
 
             

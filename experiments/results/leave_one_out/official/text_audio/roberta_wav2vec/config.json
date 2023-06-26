@@ -1,12 +1,14 @@
 {
     "text_model": "roberta",
-    "audio_model": "wav2vec2-base-960h",
-    "is_text_model_trainable": false,
-    "epochs": 500,
-    "batch_size": 8,
+    "audio_model": "wav2vec",
+    "sample_rate": 16000,
+    "is_text_model_trainable": true,
+    "epochs": 100,
+    "batch_size": 32,
     "callbacks": "early_stopping",
     "use_class_weights": true,
     "seed": 15371,
     "lr": 5e-05,
+    "max_frame_len": 768,
     "config": "text_audio"
 }

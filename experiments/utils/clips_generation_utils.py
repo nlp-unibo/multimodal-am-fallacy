@@ -5,15 +5,11 @@ from collections import defaultdict
 from pydub import AudioSegment
 import os
 import shutil
-# generate 1 dataset per id -> use the same function of MM-USElecDeb with modifications
-# this new dataset contains 3 new columns for idclip-dialogue/snippet/component
 
-#TODO: write only one function to generate clip for each kind of item (dialogue, snippet, component)
 
 project_dir = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
 
 dataset_dir = os.path.join(project_dir, "local_database", "MM-DatasetFallacies")
-
 
 
 def generate_clips_dialogue_sentences(ids, modality, dataset_path, sample_rate):
