@@ -25,10 +25,9 @@ Please refer to the specific directories for further details on their contents a
 1. Dataset Generation:
    - To generate the MM-USED-fallacy dataset starting from MM-USED and USED-fallacy, follow the following steps. The code and resources necessary for the dataset generation are included. Please, note that the file containing all the annotations for the MM-USED-fallacy dataset is already included in the `local_database/MM-DatasetFallacies/full` directory under the name `dataset.csv`.
      - Download the recordings of the debates using the information provided in the `experiments/resources/download/download_links.csv` file. The recordings should saved under `resources/debates_audio_recordings`. Please, use whatever tool you prefer to obtain the recordings.
-     - Run the `run_clips_generation.sh` script in the `runnables` directory. The script will generate the MM-USED-fallacy dataset clips and store them under a new folder `local_database/MM-DatasetFallacies/audio_clips`.
+     - Run the `run_clips_generation.sh` script in the `runnables` directory create the audio clips corresponding to the dialogues, snippets, and components. The script will generate the MM-USED-fallacy dataset clips and store them under a new folder `local_database/MM-DatasetFallacies/audio_clips`.
      
 2. Experiments:
-   - To download the audio recordings for the political debates and create the audio clips corresponding to the dialogues, snippets, and components, run the `run_clips_generation.sh` script in the `runnables` directory. The script will first download the audio recordings in the `local_database/MM-DatasetFallacies/audio_clips` directory and then create the audio clips in the `resources/debates_audio_recordings` directory.
    - To run the experiments in the paper and perform leave-one-debate-out cross-validation:
      - Open the script `runnables/leave_one_out.py` and set:
        - **_text_model_**: can have values _bert_, _roberta_, _sbert_
