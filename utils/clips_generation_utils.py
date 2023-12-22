@@ -19,7 +19,8 @@ def generate_clips_dialogue_sentences(ids, modality, dataset_path, sample_rate):
         ids = df.id_map.unique()
 
     print("IDS", ids)
-    MAIN_FOLDER_PATH = 'files/audio_clips/dial_sent'
+    MAIN_FOLDER_PATH = os.path.join(dataset_dir, "audio_clips", "dial_sent")
+    #MAIN_FOLDER_PATH = 'files/audio_clips/dial_sent'
     if not os.path.exists(MAIN_FOLDER_PATH):
         os.mkdir(MAIN_FOLDER_PATH)
     else: 
@@ -29,11 +30,16 @@ def generate_clips_dialogue_sentences(ids, modality, dataset_path, sample_rate):
     for i in tqdm(range(len(ids))):
         FOLDER_ID = ids[i]
         
-        DATASET_PATH_CLIP_EMPTY = 'datasets/dial_sent/' + FOLDER_ID + '/dataset.csv'
-        DATASET_CLIP_PATH = 'datasets/dial_sent/' + FOLDER_ID + '/dataset_clip.csv'
-        FULL_AUDIO_PATH = 'files/debates_audio_recordings/' + FOLDER_ID + '/full_audio_trim.wav'
+        #DATASET_PATH_CLIP_EMPTY = 'datasets/dial_sent/' + FOLDER_ID + '/dataset.csv'
+        #DATASET_CLIP_PATH = 'datasets/dial_sent/' + FOLDER_ID + '/dataset_clip.csv'
+        #FULL_AUDIO_PATH = 'files/debates_audio_recordings/' + FOLDER_ID + '/full_audio_trim.wav'
+        DATASET_PATH_CLIP_EMPTY = os.path.join(project_dir, "resources", "clips_generation", "dial_sent", FOLDER_ID, "dataset.csv")
+        DATASET_CLIP_PATH = os.path.join(project_dir, "resources", "clips_generation", "dial_sent", FOLDER_ID, "dataset_clip.csv")
+        FULL_AUDIO_PATH = os.path.join(project_dir, "resources", "debates_audio_recordings", FOLDER_ID, "full_audio_trim.wav")
+
         
-        AUDIO_CLIPS_PATH = 'files/audio_clips/dial_sent/' + FOLDER_ID
+        #AUDIO_CLIPS_PATH = 'files/audio_clips/dial_sent/' + FOLDER_ID
+        AUDIO_CLIPS_PATH = os.path.join(project_dir, "audio_clips", "dial_sent", FOLDER_ID)
         if not os.path.exists(AUDIO_CLIPS_PATH):
             os.mkdir(AUDIO_CLIPS_PATH)
         else:
@@ -91,7 +97,9 @@ def generate_clips_snippets(ids, modality, dataset_path, sample_rate):
     if modality == 'full':
         ids = df.id_map.unique()
 
-    MAIN_FOLDER_PATH = 'files/audio_clips/snippet'
+    #MAIN_FOLDER_PATH = 'files/audio_clips/snippet'
+    MAIN_FOLDER_PATH = os.path.join(dataset_dir, "audio_clips", "snippet")
+
     if not os.path.exists(MAIN_FOLDER_PATH):
         os.mkdir(MAIN_FOLDER_PATH)
     else: 
@@ -101,11 +109,18 @@ def generate_clips_snippets(ids, modality, dataset_path, sample_rate):
     for i in tqdm(range(len(ids))):
         FOLDER_ID = ids[i]
         
-        DATASET_PATH_CLIP_EMPTY = 'datasets/snippet/' + FOLDER_ID + '/dataset.csv'
-        DATASET_CLIP_PATH = 'datasets/snippet/' + FOLDER_ID + '/dataset_clip.csv'
-        FULL_AUDIO_PATH = 'files/debates_audio_recordings/' + FOLDER_ID + '/full_audio_trim.wav'
+        #DATASET_PATH_CLIP_EMPTY = 'datasets/snippet/' + FOLDER_ID + '/dataset.csv'
+        #DATASET_CLIP_PATH = 'datasets/snippet/' + FOLDER_ID + '/dataset_clip.csv'
+        #FULL_AUDIO_PATH = 'files/debates_audio_recordings/' + FOLDER_ID + '/full_audio_trim.wav'
+        DATASET_PATH_CLIP_EMPTY = os.path.join(project_dir, "resources", "clips_generation", "snippet", FOLDER_ID,
+                                               "dataset.csv")
+        DATASET_CLIP_PATH = os.path.join(project_dir, "resources", "clips_generation", "snippet", FOLDER_ID,
+                                         "dataset_clip.csv")
+        FULL_AUDIO_PATH = os.path.join(project_dir, "resources", "debates_audio_recordings", FOLDER_ID,
+                                       "full_audio_trim.wav")
         
-        AUDIO_CLIPS_PATH = 'files/audio_clips/snippet/' + FOLDER_ID
+        #AUDIO_CLIPS_PATH = 'files/audio_clips/snippet/' + FOLDER_ID
+        AUDIO_CLIPS_PATH = os.path.join(project_dir, "audio_clips", "snippet", FOLDER_ID)
         if not os.path.exists(AUDIO_CLIPS_PATH):
             os.mkdir(AUDIO_CLIPS_PATH)
         else:
@@ -156,7 +171,11 @@ def generate_datasets_clip_comps(dataset_path):
     df = pd.read_csv(dataset_path, sep='\t')
     ids = df.id_map.unique()
 
-    MAIN_FOLDER_PATH = 'datasets/comp/'
+    #MAIN_FOLDER_PATH = 'datasets/comp/'
+    MAIN_FOLDER_PATH = os.path.join(dataset_dir, "audio_clips", "comp")
+
+
+
     if not os.path.exists(MAIN_FOLDER_PATH):
         os.mkdir(MAIN_FOLDER_PATH)
     else: 
@@ -191,6 +210,9 @@ def generate_datasets_clip_comps(dataset_path):
 
         # save new_df as csv
         new_df.to_csv(NEW_FILES_PATH + 'dataset.csv', sep = '\t')
+
+# TODO: modify code to generate clips for comp texts and unify datasets
+
 
 def generate_clips_comps(ids, modality, dataset_path, sample_rate):
 

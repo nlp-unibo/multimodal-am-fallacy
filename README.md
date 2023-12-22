@@ -8,10 +8,7 @@ The repository includes the code required to generate the MM-USED-fallacies data
 
 ## Repository Structure
 
-- `data-creation/`: This directory contains the necessary resources and data files for generating the MM-USED-fallacies dataset.
-- `experiments/`: This directory contains the necessary resources and data files for running the experiments.
-
-The `experiments/` directory further includes the following subdirectories:
+The main directory includes the following subdirectories:
 
 - `local_database/`: This directory contains the original datasets USED-fallacy and MM-DatasetFallacies. It includes three versions of the MM-DatasetFallacies dataset: `full`, `no_duplicates`, and `partial-used` (for debugging purposes).
 - `resources/`: This directory contains additional resources for the experiments.
@@ -26,16 +23,18 @@ Please refer to the specific directories for further details on their contents a
 ## Usage
 
 1. Dataset Generation:
-   - To generate the MM-USED-fallacy dataset starting from MM-USED and USED-fallacy, follow the instructions provided in the `data-creation/` directory. The code and resources necessary for the dataset generation are included.
-  
+   - To generate the MM-USED-fallacy dataset starting from MM-USED and USED-fallacy, follow the following steps. The code and resources necessary for the dataset generation are included. Please, note that the file containing all the annotations for the MM-USED-fallacy dataset is already included in the `local_database/MM-DatasetFallacies/full` directory under the name `dataset.csv`.
+     - Download the recordings of the debates using the information provided in the `experiments/resources/download/download_links.csv` file. The recordings should saved under `resources/debates_audio_recordings`. Please, use whatever tool you prefer to obtain the recordings.
+     - Run the `run_clips_generation.sh` script in the `runnables` directory. The script will generate the MM-USED-fallacy dataset clips and store them under a new folder `local_database/MM-DatasetFallacies/audio_clips`.
+     
 2. Experiments:
-   - To download the audio recordings for the political debates and create the audio clips corresponding to the dialogues, snippets, and components, run the `run_clips_generation.sh` script in the `experiments/runnables` directory. The script will first download the audio recordings in the `local_database/MM-DatasetFallacies/audio_clips` directory and then create the audio clips in the `experiments/resources/debates_audio_recordings` directory.
+   - To download the audio recordings for the political debates and create the audio clips corresponding to the dialogues, snippets, and components, run the `run_clips_generation.sh` script in the `runnables` directory. The script will first download the audio recordings in the `local_database/MM-DatasetFallacies/audio_clips` directory and then create the audio clips in the `resources/debates_audio_recordings` directory.
    - To run the experiments in the paper and perform leave-one-debate-out cross-validation:
-     - Open the script `experiments/runnables/leave_one_out.py` and set:
+     - Open the script `runnables/leave_one_out.py` and set:
        - **_text_model_**: can have values _bert_, _roberta_, _sbert_
        - **_audio model_**: can have values _wav2vec_, _clap_
        - **_config_**: can have values _text_only_, _audio_only_, _text_audio_
-     - Run the `run_leave_one_out.sh` script in the `experiments/runnables` directory. The script will run the experiments for each debate and store the results in the `experiments/results` directory.
+     - Run the `run_leave_one_out.sh` script in the `runnables` directory. The script will run the experiments for each debate and store the results in the `results` directory.
 
 Please refer to the specific directories for further details on their contents and usage.
 

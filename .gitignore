@@ -127,14 +127,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-experiments/local_database/MM-DatasetFallacies/audio_clips/
-experiments/results/audio_only
-experiments/results/cross_validation
-experiments/results/text_audio
-experiments/results/text_only
-experiments/results/leave_one_out/audio_only
-experiments/results/leave_one_out/baseline
-experiments/results/leave_one_out/text_audio
-experiments/results/leave_one_out/text_only
-experiments/resources/debates_audio_recordings
+local_database/MM-DatasetFallacies/audio_clips/
+results/audio_only
+results/cross_validation
+results/text_audio
+results/text_only
+results/leave_one_out/audio_only
+results/leave_one_out/baseline
+results/leave_one_out/text_audio
+results/leave_one_out/text_only
+resources/debates_audio_recordings
 
