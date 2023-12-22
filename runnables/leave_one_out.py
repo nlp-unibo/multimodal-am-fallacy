@@ -43,7 +43,7 @@ elif audio_model == 'clap':
 
 
 
-config = 'text_audio'
+config = 'text_only'
 if config == 'text_only':
   config_params = {'text_model': text_model,
                   'audio_model': 'None',
