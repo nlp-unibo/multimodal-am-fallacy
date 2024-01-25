@@ -1,6 +1,6 @@
 # Multimodal Fallacy Classification in Political Debates
 
-This repository contains the code and resources for the project "Multimodal Fallacy Classification in Argument Mining," focusing on the exploration of audio's role in classifying argumentative fallacies in political debates.
+This repository contains the code and resources for the project "Multimodal Argument Mining: A Case Study in Political Debates," focusing on the exploration of audio's role in classifying argumentative fallacies in political debates.
 
 ## Dataset: MM-USED-fallacies
 
