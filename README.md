@@ -39,4 +39,4 @@ Please refer to the specific directories for further details on their contents a
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE). Feel free to use the code and
+This project is licensed under the [CC.BY License](LICENSE). 
