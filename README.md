@@ -40,3 +40,28 @@ Please refer to the specific directories for further details on their contents a
 ## License
 
 This project is licensed under the [CC.BY License](LICENSE). 
+
+
+# Citing the work 
+If using this dataset, please cite the following publication:
+
+>   Eleonora Mancini, Federico Ruggeri, and Paolo Torroni. 2024. Multimodal Fallacy Classification in Political Debates. In Proceedings of the 18th Conference of the European Chapter of the Association for Computational Linguistics (Volume 2: Short Papers), pages 170–178, St. Julian’s, Malta. Association for Computational Linguistics.
+
+```bibtex
+@inproceedings{mancini-etal-2024-multimodal,
+    title = "Multimodal Fallacy Classification in Political Debates",
+    author = "Mancini, Eleonora  and
+      Ruggeri, Federico  and
+      Torroni, Paolo",
+    editor = "Graham, Yvette  and
+      Purver, Matthew",
+    booktitle = "Proceedings of the 18th Conference of the European Chapter of the Association for Computational Linguistics (Volume 2: Short Papers)",
+    month = mar,
+    year = "2024",
+    address = "St. Julian{'}s, Malta",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2024.eacl-short.16",
+    pages = "170--178",
+}
+
+```
