@@ -65,3 +65,5 @@ If using this dataset, please cite the following publication:
 }
 
 ```
+## 🙏 Acknowledgement
+This work was partially supported by project FAIR: Future Artificial Intelligence Research (European Commission NextGeneration EU programme, PNRR-M4C2-Investimento 1.3, PE00000013-"FAIR" - Spoke 8).
